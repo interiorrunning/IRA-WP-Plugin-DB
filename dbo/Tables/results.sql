@@ -1,0 +1,22 @@
+CREATE TABLE dbo.`results` (
+  `ResultID` int NOT NULL AUTO_INCREMENT,
+  `RaceID` smallint NOT NULL,
+  `NameID` smallint NOT NULL,
+  `CityID` smallint NOT NULL,
+  `DivisionID` smallint DEFAULT NULL,
+  `Place` smallint NOT NULL,
+  `Time` time NOT NULL,
+  `LinkID` int DEFAULT NULL,
+  `StartDelay` tinyint unsigned DEFAULT NULL,
+  PRIMARY KEY (`ResultID`),
+  KEY `fk_results_cityid` (`CityID`),
+  KEY `fk_results_raceid` (`RaceID`),
+  KEY `fk_results_nameid` (`NameID`),
+  KEY `fk_results_divisionid` (`DivisionID`),
+  KEY `fk_results_linkid` (`LinkID`),
+  CONSTRAINT `fk_results_cityid` FOREIGN KEY (`CityID`) REFERENCES `cities` (`CityID`),
+  CONSTRAINT `fk_results_divisionid` FOREIGN KEY (`DivisionID`) REFERENCES `divisions` (`DivisionID`),
+  CONSTRAINT `fk_results_linkid` FOREIGN KEY (`LinkID`) REFERENCES `links` (`LinkID`),
+  CONSTRAINT `fk_results_nameid` FOREIGN KEY (`NameID`) REFERENCES `names` (`NameID`),
+  CONSTRAINT `fk_results_raceid` FOREIGN KEY (`RaceID`) REFERENCES `races` (`RaceID`)
+) ENGINE=InnoDB AUTO_INCREMENT=77579 DEFAULT CHARSET=latin1
