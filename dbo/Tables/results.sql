@@ -8,6 +8,7 @@ CREATE TABLE dbo.`results` (
   `Time` time NOT NULL,
   `LinkID` int DEFAULT NULL,
   `StartDelay` tinyint unsigned DEFAULT NULL,
+  `Age` tinyint unsigned DEFAULT NULL,
   PRIMARY KEY (`ResultID`),
   KEY `fk_results_cityid` (`CityID`),
   KEY `fk_results_raceid` (`RaceID`),
