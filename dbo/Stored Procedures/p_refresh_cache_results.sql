@@ -1,4 +1,8 @@
-CREATE PROCEDURE dbo.`p_refresh_cache_results`(
+drop procedure if exists 
+    dbo.p_refresh_cache_results;
+
+create procedure 
+    dbo.p_refresh_cache_results (
 )
 begin
 
@@ -60,13 +64,13 @@ join
 join
 	dbo.factors as af on
     af.AgeGradeVersionID = ya.AgeGradeVersionID and
-af.DistanceID = ra.DistanceID and
+    af.DistanceID = ra.DistanceID and
     af.IsMale = di.IsMale and
-    af.Age = coalesce(timestampdiff(year, li.Birthdate, ra.Date), if(di.AgeStart >= 19, di.AgeStart, if(di.AgeEnd <= 19, di.AgeEnd, 19)))
+    af.Age = coalesce(timestampdiff(year, li.Birthdate, ra.Date), re.Age, if(di.AgeStart >= 19, di.AgeStart, if(di.AgeEnd <= 19, di.AgeEnd, 19)))
 join
 	dbo.standards as ws on
     ws.AgeGradeVersionID = ya.AgeGradeVersionID and
-ws.DistanceID = ra.DistanceID and
+    ws.DistanceID = ra.DistanceID and
     ws.IsMale = di.IsMale
 order by
 	AgeGrade desc,
