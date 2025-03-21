@@ -1,0 +1,56 @@
+drop procedure if exists 
+    dbo.p_refresh_cache_athlete_info;
+
+create procedure 
+    dbo.p_refresh_cache_athlete_info (
+)
+begin
+
+declare exit handler for sqlexception rollback;
+
+start transaction with consistent snapshot;
+
+insert into 
+    dbo.cache_athlete_info (
+    Year,
+    LinkID,
+    Name,
+    City,
+    AgeGroup
+)
+select
+    Year,
+    LinkID,
+    Name,
+    City,
+    AgeGroup
+from 
+(
+    select 
+        ra.Year,
+        re.LinkID,
+        row_number() over (partition by ra.Year, re.LinkID order by ra.IsOutOfSeries, ra.Date desc) as rn,
+        na.Name,
+        ci.Name as City,
+        di.AgeGroup
+    from 
+        dbo.races as ra
+    join 
+        dbo.results as re on 
+        re.RaceID = ra.RaceID
+    join 
+        dbo.names as na on 
+        na.NameID = re.NameID 
+    join 
+        dbo.cities as ci on 
+        ci.CityID = re.CityID
+    join 
+        dbo.divisions as di on 
+        di.DivisionID = re.DivisionID
+) as t 
+where 
+    t.rn = 1;
+
+commit;
+
+end
