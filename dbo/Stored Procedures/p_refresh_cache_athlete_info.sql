@@ -16,14 +16,16 @@ insert into
     LinkID,
     Name,
     City,
-    AgeGroup
+    AgeGroup,
+    UrlName
 )
 select
     Year,
     LinkID,
     Name,
     City,
-    AgeGroup
+    AgeGroup,
+    UrlName
 from 
 (
     select 
@@ -32,12 +34,16 @@ from
         row_number() over (partition by ra.Year, re.LinkID order by ra.IsOutOfSeries, ra.Date desc) as rn,
         na.Name,
         ci.Name as City,
-        di.AgeGroup
+        di.AgeGroup,
+        li.urlname
     from 
         dbo.races as ra
     join 
         dbo.results as re on 
         re.RaceID = ra.RaceID
+    join 
+        dbo.links as li on 
+        li.LinkID = re.LinkID
     join 
         dbo.names as na on 
         na.NameID = re.NameID 
