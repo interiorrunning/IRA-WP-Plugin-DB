@@ -85,7 +85,8 @@ where
     gr.AthleteRank <= 3
 order by 
     gr.IsFemale,    
+    gr.AthleteEligibleFinishes desc,
     gr.AvgGenderPlace,
-    gr.AthleteEligibleFinishes desc;
+    cai.Name;
 
 end
