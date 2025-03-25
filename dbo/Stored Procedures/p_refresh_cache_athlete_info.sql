@@ -14,6 +14,7 @@ insert into
     dbo.cache_athlete_info (
     Year,
     LinkID,
+    IsLatest,
     Name,
     City,
     AgeGroup,
@@ -22,6 +23,7 @@ insert into
 select
     Year,
     LinkID,
+    if(lrn = 1, 1, 0) as IsLatest,
     Name,
     City,
     AgeGroup,
@@ -31,6 +33,7 @@ from
     select 
         ra.Year,
         re.LinkID,
+        row_number() over (partition by re.LinkID order by ra.Date desc) as lrn,
         row_number() over (partition by ra.Year, re.LinkID order by ra.IsOutOfSeries, ra.Date desc) as rn,
         na.Name,
         ci.Name as City,

@@ -1,13 +1,23 @@
-CREATE PROCEDURE dbo.`p_get_athlete_info`(	
-    IN UrlName varchar(50) 
+
+drop procedure if exists 
+	dbo.p_get_athlete_info;
+
+create procedure
+	dbo.p_get_athlete_info (	
+    in UrlName varchar(50) 
 )
 begin
 select
 	li.urlname,
-    na.Name,
-    na.City
+    cai.Name,
+    cai.City
 from
 	dbo.links as li
+join 
+	dbo.cache_athlete_info as cai on 
+	cai.LinkID = li.LinkID and 
+	cai.IsLatest = 1
+/*	
 join lateral
 (
 	select
@@ -30,6 +40,7 @@ join lateral
 		ra.Date desc
 	limit 1
 ) as na
+*/
 where
 	li.urlname = UrlName;
 
