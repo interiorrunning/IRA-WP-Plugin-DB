@@ -33,10 +33,15 @@ GenderRankByCompleted as
     select
         gr.IsFemale,
         gr.LinkID,
-        avg(gr.GenderPlace) as AvgGenderPlace,
+        avg(gr.GenderPlace) as AvgPlace,
         json_arrayagg(gr.GenderPlace) as Finishes,
         rank() over (partition by gr.IsFemale, max(gr.BestFinishesRowNumber) order by avg(gr.GenderPlace)) as AthleteRank,                 
-        max(gr.BestFinishesRowNumber) as AthleteEligibleFinishes
+        max(gr.BestFinishesRowNumber) as EligibleFinishes,
+        (
+            min(err.Races) +
+            coalesce(min(ert.Races), 0) -
+            min(rac.SeriesCompletedRaces)
+        ) as RemainingRaces
     from 
         GenderRank as gr
     join 
@@ -65,7 +70,7 @@ GenderRankByCompleted as
         gr.IsFemale,
         gr.LinkID
     having 
-        min(err.MaxRaces) <= (cast(min(err.Races) as signed) + coalesce(min(ert.Races), 0) + max(gr.BestFinishesRowNumber) - min(rac.SeriesCompletedRaces))
+        min(err.MaxRaces) <= (min(err.Races) + coalesce(min(ert.Races), 0) + max(gr.BestFinishesRowNumber) - min(rac.SeriesCompletedRaces))
 )
 select
     cai.UrlName,    
@@ -73,7 +78,6 @@ select
     cai.Name,
     cai.City,
     cai.AgeGroup,    
-    --gr.AvgGenderPlace as AvgPlace,
     gr.Finishes
 from 
     GenderRankByCompleted as gr
@@ -81,12 +85,12 @@ join
     dbo.cache_athlete_info as cai on 
     cai.Year = Year and 
     cai.LinkID = gr.LinkID
-where
-    gr.AthleteRank <= 3
+where    
+    gr.AthleteRank <= greatest(3, 6 - gr.RemainingRaces)
 order by 
     gr.IsFemale,    
-    gr.AthleteEligibleFinishes desc,
-    gr.AvgGenderPlace,
+    gr.EligibleFinishes desc,
+    gr.AvgPlace,
     cai.Name;
 
-end
+end 
