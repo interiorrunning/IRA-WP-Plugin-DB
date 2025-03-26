@@ -10,11 +10,13 @@ declare exit handler for sqlexception rollback;
 
 start transaction with consistent snapshot;
 
+delete from
+	dbo.cache_athlete_info;
+
 insert into 
     dbo.cache_athlete_info (
     Year,
-    LinkID,
-    IsLatest,
+    LinkID,    
     Name,
     City,
     AgeGroup,
@@ -22,8 +24,7 @@ insert into
 )
 select
     Year,
-    LinkID,
-    if(lrn = 1, 1, 0) as IsLatest,
+    LinkID,    
     Name,
     City,
     AgeGroup,
@@ -32,8 +33,7 @@ from
 (
     select 
         ra.Year,
-        re.LinkID,
-        row_number() over (partition by re.LinkID order by ra.Date desc) as lrn,
+        re.LinkID,        
         row_number() over (partition by ra.Year, re.LinkID order by ra.IsOutOfSeries, ra.Date desc) as rn,
         na.Name,
         ci.Name as City,
@@ -59,6 +59,36 @@ from
 ) as t 
 where 
     t.rn = 1;
+
+delete from
+	dbo.cache_athlete_info_latest;
+
+insert into 
+    dbo.cache_athlete_info_latest (    
+    LinkID,    
+    Name,
+    City,
+    AgeGroup,
+    UrlName
+)
+select    
+    LinkID,    
+    Name,
+    City,
+    AgeGroup,
+    UrlName
+from 
+(
+    select         
+        row_number() over (partition by cai.LinkID order by cai.Year desc) as rn,
+        cai.*
+    from 
+        dbo.cache_athlete_info as cai
+) as t 
+where 
+    t.rn = 1;
+
+
 
 commit;
 
