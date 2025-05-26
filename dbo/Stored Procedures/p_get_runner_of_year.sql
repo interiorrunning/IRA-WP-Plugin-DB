@@ -28,13 +28,25 @@ with GenderRank as
         ra.Year = Year and 
         ra.IsOutOfSeries = 0
 ),
+GenderRankFinishes as 
+(
+    select
+        gr.LinkID,
+        gr.IsFemale,
+        json_arrayagg(gr.GenderPlace) as Finishes
+    from 
+        GenderRank as gr
+    group by 
+        gr.LinkID,
+        gr.IsFemale
+),
 GenderRankByCompleted as 
 (
     select
         gr.IsFemale,
         gr.LinkID,
         avg(gr.GenderPlace) as AvgPlace,
-        json_arrayagg(gr.GenderPlace) as Finishes,
+        grf.Finishes,
         rank() over (partition by gr.IsFemale, max(gr.BestFinishesRowNumber) order by avg(gr.GenderPlace)) as AthleteRank,                 
         max(gr.BestFinishesRowNumber) as EligibleFinishes,
         (
@@ -44,6 +56,10 @@ GenderRankByCompleted as
         ) as RemainingRaces
     from 
         GenderRank as gr
+    join 
+        GenderRankFinishes as grf on 
+        grf.LinkID = gr.LinkID and
+        grf.IsFemale = gr.IsFemale 
     join 
         dbo.eligible_races as err on 
         err.`Year` = Year and 
@@ -66,7 +82,7 @@ GenderRankByCompleted as
     ) as rac
     where 
         gr.BestFinishesRowNumber <= err.MaxRaces        
-    group by
+    group by        
         gr.IsFemale,
         gr.LinkID
     having 
@@ -93,4 +109,4 @@ order by
     gr.AvgPlace,
     cai.Name;
 
-end 
+end
