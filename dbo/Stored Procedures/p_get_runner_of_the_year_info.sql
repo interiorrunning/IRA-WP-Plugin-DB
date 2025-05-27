@@ -1,7 +1,7 @@
 drop procedure if exists 
-	dbo.p_get_runner_of_year_info;
+	dbo.p_get_runner_of_the_year_info;
 
-create procedure dbo.p_get_runner_of_year_info (
+create procedure dbo.p_get_runner_of_the_year_info (
 	in Year smallint
 )
 begin
