@@ -32,9 +32,9 @@ select
     if(di.IsWheeler = 1, 0, rank() over (partition by re.RaceID, di.IsFemale, di.IsWheeler order by re.Time)) as GenderPlace,
     if(di.IsWheeler = 1, 0, rank() over (partition by re.RaceID, di.DivisionID, di.IsWheeler order by re.Time)) as AgeGroupPlace,
     if(di.IsWheeler = 1, 0, rank() over (partition by re.RaceID, di.IsFemale, di.IsWheeler order by (ws.Standard / time_to_sec(re.Time) / af.Factor) desc)) as AgeGradePlace,
-    if(di.IsWheeler = 1, 0, rank() over (partition by ra.IsAwardEligible, ra.SeriesID, di.IsFemale, di.IsWheeler order by re.Time)) as SeriesGenderPlace,
-    if(di.IsWheeler = 1, 0, rank() over (partition by ra.IsAwardEligible, ra.SeriesID, di.DivisionID, di.IsWheeler order by re.Time)) as SeriesAgeGroupPlace,
-    if(di.IsWheeler = 1, 0, rank() over (partition by ra.IsAwardEligible, ra.SeriesID, di.IsFemale, di.IsWheeler order by (ws.Standard / time_to_sec(re.Time) / af.Factor) desc)) as SeriesAgeGradePlace
+    if(di.IsWheeler = 1 or ra.IsAwardEligible = 0 or ra.IsAwardEligible is null, 0, rank() over (partition by ra.IsAwardEligible, ra.SeriesID, di.IsFemale, di.IsWheeler order by re.Time)) as SeriesGenderPlace,
+    if(di.IsWheeler = 1 or ra.IsAwardEligible = 0 or ra.IsAwardEligible is null, 0, rank() over (partition by ra.IsAwardEligible, ra.SeriesID, di.DivisionID, di.IsWheeler order by re.Time)) as SeriesAgeGroupPlace,
+    if(di.IsWheeler = 1 or ra.IsAwardEligible = 0 or ra.IsAwardEligible is null, 0, rank() over (partition by ra.IsAwardEligible, ra.SeriesID, di.IsFemale, di.IsWheeler order by (ws.Standard / time_to_sec(re.Time) / af.Factor) desc)) as SeriesAgeGradePlace
 from
 	dbo.results as re
 join
