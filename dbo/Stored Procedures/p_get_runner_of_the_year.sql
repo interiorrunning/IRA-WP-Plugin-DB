@@ -102,7 +102,7 @@ join
     cai.Year = Year and 
     cai.LinkID = gr.LinkID
 where    
-    gr.AthleteRank <= greatest(2, 6 - gr.RemainingRaces)
+    gr.AthleteRank <= greatest(2, 10 - gr.RemainingRaces)
 order by 
     gr.IsFemale,    
     gr.EligibleFinishes desc,
