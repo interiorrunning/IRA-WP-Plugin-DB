@@ -1,11 +1,15 @@
-CREATE PROCEDURE dbo.`p_get_awards`(
+drop procedure if exists
+    dbo.p_get_awards;
+
+create procedure dbo.p_get_awards(
 	IN Year smallint
 )
 begin
+
 select
 	lin.urlname,
-    nam.Name,
-    cit.Name as City,
+    cai.Name,
+    cai.City,
     awa.Name as Award,
     awa.Subtitle
 from
@@ -16,12 +20,10 @@ join
 join
 	dbo.links as lin on
     lin.LinkID = win.LinkID
-join
-	dbo.names as nam on
-    nam.NameID = win.NameID
-join
-	dbo.cities as cit on
-    cit.CityID = win.CityID
+join 
+    dbo.cache_athlete_info as cai on 
+    cai.LinkID = win.LinkID and 
+    cai.`Year` = Year
 where
 	win.Year = Year and
     (
@@ -42,7 +44,7 @@ where
     )
 order by
 	awa.SortOrder,
-    nam.Name;
+    cai.Name;
 
     
 end
